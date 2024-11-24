@@ -40,12 +40,36 @@ class MLP:
 
     def backward(self, X, y):
         # TODO: compute gradients using chain rule
+        m = X.shape[0]
+
+        delta2 = (self.activations['output'] - y) * (1 - self.activations['output']**2)
+        dW2 = np.dot(self.a1.T, delta2)
+        db2 = np.sum(delta2, axis=0, keepdims=True)
+        
+        # Hidden layer gradients
+        if self.activation_fn == 'tanh':
+            da1 = 1 - self.a1**2
+        elif self.activation_fn == 'relu':
+            da1 = (self.z1 > 0).astype(float)
+        else:  # sigmoid
+            da1 = self.a1 * (1 - self.a1)
+
+        delta1 = np.dot(delta2, self.W2.T) * da1
+        dW1 = np.dot(X.T, delta1)
+        db1 = np.sum(delta1, axis=0, keepdims=True)
 
         # TODO: update weights with gradient descent
 
+        self.W1 -= self.lr * dW1
+        self.b1 -= self.lr * db1
+        self.W2 -= self.lr * dW2
+        self.b2 -= self.lr * db2
+
+
         # TODO: store gradients for visualization
 
-        pass
+        self.gradients['W1'] = dW1
+        self.gradients['W2'] = dW2
 
 def generate_data(n_samples=100):
     np.random.seed(0)
