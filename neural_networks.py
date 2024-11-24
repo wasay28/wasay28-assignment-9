@@ -23,8 +23,19 @@ class MLP:
         
     def forward(self, X):
         # TODO: forward pass, apply layers to input X
+        self.z1 = np.dot(X, self.W1) + self.b1
+        if self.activation_fn == 'tanh':
+            self.a1 = np.tanh(self.z1)
+        elif self.activation_fn == 'relu':
+            self.a1 = np.maximum(0, self.z1)
+        else:  # sigmoid
+            self.a1 = 1 / (1 + np.exp(-self.z1))
+        
+        self.z2 = np.dot(self.a1, self.W2) + self.b2
         # TODO: store activations for visualization
-        out = ...
+        out = np.tanh(self.z2)
+        self.activations['hidden'] = self.a1
+        self.activations['output'] = out
         return out
 
     def backward(self, X, y):
