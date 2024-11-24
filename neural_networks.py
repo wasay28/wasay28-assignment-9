@@ -20,6 +20,9 @@ class MLP:
         self.b1 = np.zeros((1, hidden_dim))
         self.W2 = np.random.randn(hidden_dim, output_dim) * 0.1
         self.b2 = np.zeros((1, output_dim))
+        # Initialize storage dictionaries
+        self.activations = {'hidden': None, 'output': None}
+        self.gradients = {'W1': None, 'W2': None}
         
     def forward(self, X):
         # TODO: forward pass, apply layers to input X
