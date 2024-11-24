@@ -16,7 +16,11 @@ class MLP:
         self.lr = lr # learning rate
         self.activation_fn = activation # activation function
         # TODO: define layers and initialize weights
-
+        self.W1 = np.random.randn(input_dim, hidden_dim) * 0.1
+        self.b1 = np.zeros((1, hidden_dim))
+        self.W2 = np.random.randn(hidden_dim, output_dim) * 0.1
+        self.b2 = np.zeros((1, output_dim))
+        
     def forward(self, X):
         # TODO: forward pass, apply layers to input X
         # TODO: store activations for visualization
