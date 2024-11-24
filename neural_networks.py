@@ -92,17 +92,52 @@ def update(frame, mlp, ax_input, ax_hidden, ax_gradient, X, y):
         mlp.backward(X, y)
         
     # TODO: Plot hidden features
-    hidden_features = ...
+    hidden_features = mlp.activations['hidden']
     ax_hidden.scatter(hidden_features[:, 0], hidden_features[:, 1], hidden_features[:, 2], c=y.ravel(), cmap='bwr', alpha=0.7)
 
     # TODO: Hyperplane visualization in the hidden space
+    xx, yy = np.meshgrid(np.linspace(-2, 2, 20), np.linspace(-2, 2, 20))
+    zz = -(mlp.W2[0] * xx + mlp.W2[1] * yy + mlp.b2[0]) / (mlp.W2[2] + 1e-6)
+    ax_hidden.plot_surface(xx, yy, zz, alpha=0.2)
 
     # TODO: Distorted input space transformed by the hidden layer
+    xx, yy = np.meshgrid(np.linspace(-2, 2, 100), np.linspace(-2, 2, 100))
+    grid_points = np.c_[xx.ravel(), yy.ravel()]
+    Z = mlp.forward(grid_points).reshape(xx.shape)
+    ax_input.contourf(xx, yy, Z, levels=20, cmap='RdBu', alpha=0.5)
+    ax_input.scatter(X[:, 0], X[:, 1], c=y.ravel(), cmap='bwr')
 
     # TODO: Plot input layer decision boundary
+    layer_pos = {'input': [-2, 0], 'hidden': [0, 0], 'output': [2, 0]}
+
+    for i, layer in enumerate(['input', 'hidden', 'output']):
+        num_nodes = 2 if layer == 'input' else 3 if layer == 'hidden' else 1
+        for j in range(num_nodes):
+            y_pos = (j - (num_nodes-1)/2) * 0.5
+            circle = Circle([layer_pos[layer][0], y_pos], 0.1, fill=False)
+            ax_gradient.add_patch(circle)
 
     # TODO: Visualize features and gradients as circles and edges 
     # The edge thickness visually represents the magnitude of the gradient
+    max_thickness = 3
+    for i in range(2):  # Input layer
+        for j in range(3):  # Hidden layer
+            grad = np.abs(mlp.gradients['W1'][i,j])
+            thickness = grad / (np.max(np.abs(mlp.gradients['W1'])) + 1e-6) * max_thickness
+            ax_gradient.plot([layer_pos['input'][0], layer_pos['hidden'][0]],
+                           [i*0.5 - 0.25, j*0.5 - 0.5],
+                           'k-', linewidth=thickness)
+    
+    for i in range(3):  # Hidden to output connections
+        grad = np.abs(mlp.gradients['W2'][i,0])
+        thickness = grad / (np.max(np.abs(mlp.gradients['W2'])) + 1e-6) * max_thickness
+        ax_gradient.plot([layer_pos['hidden'][0], layer_pos['output'][0]],
+                        [i*0.5 - 0.5, 0],
+                        'k-', linewidth=thickness)
+    
+    ax_gradient.set_xlim(-3, 3)
+    ax_gradient.set_ylim(-2, 2)
+    ax_gradient.axis('equal')
 
 
 def visualize(activation, lr, step_num):
