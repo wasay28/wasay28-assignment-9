@@ -16,11 +16,10 @@ def run_experiment():
     lr = float(request.json['lr'])
     step_num = int(request.json['step_num'])
 
-    # Run the experiment with the provided parameters
-    visualize(activation, lr, step_num)
+    result_gif = f"results/visualize_{activation}.gif"
 
-    # Check if result gif is generated and return their paths
-    result_gif = "results/visualize.gif"
+    # Run the experiment with the provided parameters
+    visualize(activation, lr, step_num, result_gif)
     
     return jsonify({
         "result_gif": result_gif if os.path.exists(result_gif) else None,

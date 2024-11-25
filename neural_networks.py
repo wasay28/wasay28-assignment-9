@@ -143,26 +143,27 @@ def update(frame, mlp, ax_input, ax_hidden, ax_gradient, X, y):
     ax_gradient.axis('equal')
 
 
-def visualize(activation, lr, step_num):
+def visualize(activation, lr, step_num, output_file):
     X, y = generate_data()
     mlp = MLP(input_dim=2, hidden_dim=3, output_dim=1, lr=lr, activation=activation)
 
     # Set up visualization
-    matplotlib.use('agg')
+    matplotlib.use('agg')  
     fig = plt.figure(figsize=(21, 7))
     ax_hidden = fig.add_subplot(131, projection='3d')
     ax_input = fig.add_subplot(132)
     ax_gradient = fig.add_subplot(133)
 
     # Create animation
-    ani = FuncAnimation(fig, partial(update, mlp=mlp, ax_input=ax_input, ax_hidden=ax_hidden, ax_gradient=ax_gradient, X=X, y=y), frames=step_num//10, repeat=False)
+    ani = FuncAnimation(fig, partial(update, mlp=mlp, ax_input=ax_input, ax_hidden=ax_hidden, 
+                       ax_gradient=ax_gradient, X=X, y=y), frames=step_num//10, repeat=False)
 
-    # Save the animation as a GIF
-    ani.save(os.path.join(result_dir, "visualize.gif"), writer='pillow', fps=10)
+    # Save with the provided filename
+    ani.save(output_file, writer='pillow', fps=10)
     plt.close()
 
 if __name__ == "__main__":
     activation = "tanh"
     lr = 0.1
     step_num = 1000
-    visualize(activation, lr, step_num)
+    visualize(activation, lr, step_num, "results/visualize_test.gif")
